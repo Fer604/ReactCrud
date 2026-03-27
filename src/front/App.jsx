@@ -1,12 +1,12 @@
 import { useState } from 'react'
-// import './App.css'
+import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <section id="center">
+      {/* <section id="center">
         <div>
           <h1>Get started</h1>
           <p>
@@ -103,7 +103,16 @@ function App() {
       </section>
 
       <div className="ticks"></div>
-      <section id="spacer"></section>
+      <section id="spacer"></section> */}
+
+
+    {/* pagina de listagem */}
+      <section>
+        <div>
+          <h1>whatup</h1>
+
+        </div>
+      </section>
     </>
   )
 }
