@@ -24,46 +24,60 @@ app.get('/books', async (req, res) => {
 });
 
 
-//exemplo de postgress
+app.post('/books', async (req, res) => {
+  const data = req.body;
 
-// app.post('/books', async (req, res) => {  
-//   let data = req.body;
+  try {
+    const [result] = await db.query(
+      `INSERT INTO books 
+      (title, author_fname, author_lname, released_year, stock_quantity, pages)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        data.title,
+        data.author_fname,
+        data.author_lname,
+        data.released_year,
+        data.stock_quantity,
+        data.pages
+      ]
+    );
 
-//   const newBook = { 
-//     title: data.title,
-//     author_fname: data.author_fname,
-//     author_lname: data.author_lname,
-//     released_year: data.released_year,
-//     stock_quantity: data.stock_quantity,
-//     pages:data.pages
-//   };
+    res.status(201).json({ bookId: result.insertId });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-//   try {
-//     const result = await db.query('\
-//         INSERT INTO books.data( \
-//           title, \
-//           author_fname, \
-//           author_lname, \
-//           released_year, \
-//           stock_quantity, \
-//           pages\
-//         ) \
-//         VALUES($1, $2, $3, $4, $5, $6) \
-//         RETURNING book_id;', 
-//       [
-//         newBook.title, 
-//         newBook.author_fname, 
-//         newBook.author_lname, 
-//         newBook.released_year, 
-//         newBook.stock_quantity
-//       ]);
+app.patch('/users/:user_id', async (req, res) => {
+  const {user_id} = req.params;
+  let data = req.body;
 
-//     res.status(201).json({ BookID: result.rows[0].book_id });
-//   }
-//   catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
+  const newUser = { 
+    name: data.name,
+    cpf: data.cpf,
+    age: data.age,
+    telephone: data.number,
+    email: data.email
+  };
+
+  try {
+    await db.query('update books set title =?, author_fname=?, author_lname=?, released_year=?, stock_quantity=?, pages=? where book_id = ?',
+      [
+        data.bookId,
+        data.title,
+        data.author_fname,
+        data.author_lname,
+        data.released_year,
+        data.stock_quantity,
+        data.pages
+      ]);
+
+    res.status(204).json();
+  }
+  catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 
 
