@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
-function Home(){
-    return(
+function Teste() {
+    return (
         <>
             <h1>whatup</h1>
         </>
     )
 }
-export default Home;
+
+export default Teste;
