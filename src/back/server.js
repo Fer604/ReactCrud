@@ -14,6 +14,8 @@ try {
   console.error(err);
 }
 
+
+//get all
 app.get('/books', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM books');
@@ -23,7 +25,16 @@ app.get('/books', async (req, res) => {
   }
 });
 
+// GET ONE
+app.get("/books/:id", (req, res) => {
+  const id = req.params.id;
+  db.query("SELECT * FROM books WHERE book_id = ?", [id], (err, result) => {
+    if (err) return res.json(err);
+    res.json(result[0]);
+  });
+});
 
+//add
 app.post('/books', async (req, res) => {
   const data = req.body;
 
@@ -48,35 +59,31 @@ app.post('/books', async (req, res) => {
   }
 });
 
-app.patch('/users/:user_id', async (req, res) => {
-  const {user_id} = req.params;
-  let data = req.body;
+//UPDATE
+app.put("/books/:id", (req, res) => {
+  const id = req.params.id;
+  const { title, author_fname, author_lname } = req.body;
 
-  const newUser = { 
-    name: data.name,
-    cpf: data.cpf,
-    age: data.age,
-    telephone: data.number,
-    email: data.email
-  };
+  db.query(
+    "UPDATE books SET title=?, author_fname=?, author_lname=? WHERE book_id=?",
+    [title, author_fname, author_lname, id],
+    (err, result) => {
+      if (err) return res.json(err);
+      res.json("Livro atualizado");
+    }
+  );
+});
 
-  try {
-    await db.query('update books set title =?, author_fname=?, author_lname=?, released_year=?, stock_quantity=?, pages=? where book_id = ?',
-      [
-        data.bookId,
-        data.title,
-        data.author_fname,
-        data.author_lname,
-        data.released_year,
-        data.stock_quantity,
-        data.pages
-      ]);
 
-    res.status(204).json();
-  }
-  catch (err) {
-    res.status(500).send(err.message);
-  }
+
+//DELETE
+app.delete("/books/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM books WHERE book_id=?", [id], (err, result) => {
+    if (err) return res.json(err);
+    res.json("Livro deletado");
+  });
 });
 
 

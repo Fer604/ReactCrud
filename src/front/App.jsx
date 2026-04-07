@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+
 import Home from './pages/Home';
-import Teste from './pages/Teste';
+import Create from './pages/Create';
+import Update from './pages/Update';
 // import About from './pages/About';
 
 
@@ -11,8 +13,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/Create" element={<Teste />} />
+          <Route path="/Create" element={<Create />} />
           {/* <Route path="/about" element={<About />} /> */}
+          <Route path="/Update/:book_id" element={<Update/>}/>
         </Routes>
       </Router>
     </>
@@ -21,3 +24,4 @@ function App() {
 }
 
 export default App;
+
