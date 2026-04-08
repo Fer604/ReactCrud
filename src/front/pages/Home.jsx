@@ -24,9 +24,12 @@ function Home() {
       const response = await fetch(`http://localhost:3001/books/${id}`, {
         method: "DELETE",
       });
+      console.log("PINTO")
 
       if (response.ok) {
-        setReload((prev) => prev + 1);
+        setBooks(prevBooks =>
+          prevBooks.filter(book => Number(book.book_id) !== Number(id))
+        );
       }
     } catch (err) {
       console.error(err);
@@ -67,7 +70,7 @@ function Home() {
             <div>
               <div className="flex justify-end w-full gap-2 mt-2">
                 <button
-                  class="inline-flex cursor-pointer items-center justify-center px-4 py-2 bg-cyan-500 ease-in-out delay-75 hover:bg-cyan-600
+                  className="inline-flex cursor-pointer items-center justify-center px-4 py-2 bg-cyan-500 ease-in-out delay-75 hover:bg-cyan-600
                 text-white text-sm font-medium rounded-md active:scale-95 transition-all duration-200"
 
                   onClick={() => handleUpdate(book.book_id)}

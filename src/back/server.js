@@ -26,12 +26,12 @@ app.get('/books', async (req, res) => {
 });
 
 // GET ONE
-app.get("/books/:id", (req, res) => {
+app.get("/books/:id", async (req, res) => {
   const id = req.params.id;
-  db.query("SELECT * FROM books WHERE book_id = ?", [id], (err, result) => {
-    if (err) return res.json(err);
-    res.json(result[0]);
-  });
+    db.query("SELECT * FROM books WHERE book_id = ?", [id], (err, result) => {
+      if (err) return res.json(err);
+      res.json(result[0]);
+    });
 });
 
 //add
@@ -60,7 +60,7 @@ app.post('/books', async (req, res) => {
 });
 
 //UPDATE
-app.patch("/books/:id", (req, res) => {
+app.patch("/books/:id", async (req, res) => {
   const id = req.params.id;
   const { title, author_fname, author_lname } = req.body;
 
@@ -77,17 +77,18 @@ app.patch("/books/:id", (req, res) => {
 
 
 //DELETE
-app.delete("/books/:id", (req, res) => {
+app.delete('/books/:id', async (req, res) => {
   const id = req.params.id;
 
-  db.query("DELETE FROM books WHERE book_id=?", [id], (err, result) => {
-    if (err) {
-      console.error("Erro ao deletar:", err);
-      return res.status(500).json({ error: err.message });
-    }
-    console.log("Livro deletado com ID:", id);
-    res.status(204).send();
-  });
+  try {
+    await db.query('DELETE FROM books WHERE book_id = ?', [id]);
+
+    console.log('Livro deletado com ID:', id);
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('Erro ao deletar:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 

@@ -41,11 +41,11 @@ function Create() {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <button
         onClick={handleBack}
-        class="bg-gray-900 text-center w-48 rounded-2xl h-14 relative text-white text-xl font-semibold group"
+        className="bg-gray-900 text-center w-48 rounded-2xl h-14 relative text-white text-xl font-semibold group"
         type="button"
       >
         <div
-          class="bg-purple-400 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500"
+          className="bg-purple-400 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -63,11 +63,14 @@ function Create() {
             ></path>
           </svg>
         </div>
-        <p class="translate-x-2">Voltar</p>
+        <p className="translate-x-2">Voltar</p>
       </button>
 
 
-      <form className="p-8 flex justify-between flex-col gap-2 items-center mt-6 mb-6">
+      <form
+       className="p-8 flex justify-between flex-col gap-2 items-center mt-6 mb-6"
+       onSubmit={handleSubmit}
+      >
         <input 
           className="bg-gray-700 text-white p-2 rounded"
           name="title"
@@ -117,7 +120,7 @@ function Create() {
         />
 
         <button
-         onClick={handleSubmit}
+         type="submit"
          className="cursor-pointer bg-purple-600 p-2 rounded"
 
         >

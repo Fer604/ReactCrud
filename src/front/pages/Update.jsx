@@ -25,7 +25,7 @@ function Update() {
     e.preventDefault();
 
     fetch(`http://localhost:3001/books/${book_id}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
@@ -34,13 +34,20 @@ function Update() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 text-white">
-      <input name="title" value={book.title} onChange={handleChange} />
-      <input name="author_fname" value={book.author_fname} onChange={handleChange} />
-      <input name="author_lname" value={book.author_lname} onChange={handleChange} />
+    <>
+      <div className="min-h-screen bg-gray-900 text-white p-8">
+        <form onSubmit={handleSubmit} className="p-8 flex justify-between flex-col gap-2 items-center mt-6 mb-6">
+          <input className="bg-gray-700"name="title" value={book.title} onChange={handleChange} />
+          <input className="bg-gray-700"name="author_fname" value={book.author_fname} onChange={handleChange} />
+          <input className="bg-gray-700"name="author_lname" value={book.author_lname} onChange={handleChange} />
 
-      <button type="submit">Atualizar</button>
-    </form>
+          <button 
+          type="submit"
+          className="cursor-pointer bg-purple-600 p-2 rounded"
+          >Atualizar</button>
+        </form>
+      </div>
+    </>
   );
 }
 
