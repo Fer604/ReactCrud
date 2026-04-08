@@ -28,10 +28,13 @@ app.get('/books', async (req, res) => {
 // GET ONE
 app.get("/books/:id", async (req, res) => {
   const id = req.params.id;
-    db.query("SELECT * FROM books WHERE book_id = ?", [id], (err, result) => {
-      if (err) return res.json(err);
-      res.json(result[0]);
-    });
+    try {
+    const result = await db.query("SELECT * FROM books WHERE book_id = ?", [id]);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('deu ruim ao getar um:',err);
+    res.status(500).json({error:err.message});
+  }
 });
 
 //add
@@ -64,14 +67,21 @@ app.patch("/books/:id", async (req, res) => {
   const id = req.params.id;
   const { title, author_fname, author_lname } = req.body;
 
-  db.query(
-    "UPDATE books SET title=?, author_fname=?, author_lname=? WHERE book_id=?",
-    [title, author_fname, author_lname, id],
-    (err, result) => {
-      if (err) return res.json(err);
-      res.json("Livro atualizado");
-    }
-  );
+  try {
+    const [result] = await db.query(
+      'UPDATE books SET title=?, author_fname=?, author_lname=? WHERE book_id=?',
+      [
+        title,
+        author_fname,
+        author_lname,
+        id]);
+
+    console.log('Livro atualizado com ID:', id);
+    res.sendStatus(201).json({bookId:id});
+  } catch (err) {
+    console.error('deu ruim ao updatear:',err);
+    res.status(500).json({error:err.message});
+  }
 });
 
 

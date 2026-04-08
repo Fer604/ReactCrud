@@ -23,14 +23,17 @@ function Update() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    console.log("1");
     fetch(`http://localhost:3001/books/${book_id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(book),
-    }).then(() => navigate("/"));
+    })
+    .then(() => navigate("/"))
+    .catch(err=> console.error(err));
+    console.log("1");
   };
 
   return (
