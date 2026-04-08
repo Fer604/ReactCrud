@@ -60,7 +60,7 @@ app.post('/books', async (req, res) => {
 });
 
 //UPDATE
-app.put("/books/:id", (req, res) => {
+app.patch("/books/:id", (req, res) => {
   const id = req.params.id;
   const { title, author_fname, author_lname } = req.body;
 
@@ -81,8 +81,12 @@ app.delete("/books/:id", (req, res) => {
   const id = req.params.id;
 
   db.query("DELETE FROM books WHERE book_id=?", [id], (err, result) => {
-    if (err) return res.json(err);
-    res.json("Livro deletado");
+    if (err) {
+      console.error("Erro ao deletar:", err);
+      return res.status(500).json({ error: err.message });
+    }
+    console.log("Livro deletado com ID:", id);
+    res.status(204).send();
   });
 });
 

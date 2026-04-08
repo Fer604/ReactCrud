@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [books, setBooks] = useState([]);
+  const [reload, setReload] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -10,7 +11,7 @@ function Home() {
       .then(res => res.json())
       .then(data => setBooks(data))
       .catch(err => console.error(err));
-  }, []);
+  }, [reload]);
 
   const handlePage = () => {
     navigate("/Create");
@@ -18,14 +19,19 @@ function Home() {
   const handleUpdate = (id) => {
     navigate(`/Update/${id}`);
   };
-  const handleDelete = (id) => {
-  fetch(`http://localhost:3001/books/${id}`, {
-    method: "DELETE",
-  })
-    .then(() => {
-      setBooks(books.filter(book => book.book_id !== id));
-    });
-};
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3001/books/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setReload((prev) => prev + 1);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 ">
@@ -61,36 +67,36 @@ function Home() {
             <div>
               <div className="flex justify-end w-full gap-2 mt-2">
                 <button
-                class="inline-flex cursor-pointer items-center justify-center px-4 py-2 bg-cyan-500 ease-in-out delay-75 hover:bg-cyan-600
+                  class="inline-flex cursor-pointer items-center justify-center px-4 py-2 bg-cyan-500 ease-in-out delay-75 hover:bg-cyan-600
                 text-white text-sm font-medium rounded-md active:scale-95 transition-all duration-200"
 
-                onClick={()=>handleUpdate(book.book_id)}
+                  onClick={() => handleUpdate(book.book_id)}
                 >
-                <svg
-                  class="h-5 w-5 mr-1 self-center items-center"
-                  fill="none"
-                  stroke="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"
-                  ></path>
-                </svg>
-                Edit
-              </button>
+                  <svg
+                    className="h-5 w-5 mr-1 self-center items-center"
+                    fill="none"
+                    stroke="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"
+                    ></path>
+                  </svg>
+                  Edit
+                </button>
 
-                
+
                 <button
-                  class="inline-flex cursor-pointer items-center px-4 py-2 bg-rose-500 transition ease-in-out delay-75
+                  className="inline-flex cursor-pointer items-center px-4 py-2 bg-rose-500 transition ease-in-out delay-75
                   hover:bg-rose-600 text-white text-sm font-medium rounded-md "
 
-                  onClick={()=>handleDelete(book.book_id)}
+                  onClick={() => handleDelete(book.book_id)}
                 >
                   <svg
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     fill="none"
-                    class="h-5 w-5 mr-2"
+                    className="h-5 w-5 mr-2"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -107,7 +113,7 @@ function Home() {
 
               </div>
             </div>
-          </div>      
+          </div>
 
         ))}
 
