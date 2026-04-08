@@ -29,12 +29,17 @@ app.get('/books', async (req, res) => {
 app.get("/books/:id", async (req, res) => {
   const id = req.params.id;
     try {
+    console.log("pinto1")
     const result = await db.query("SELECT * FROM books WHERE book_id = ?", [id]);
-    res.status(200).json(result.rows);
+    res.status(200).json(result[0]);
+    console.log("pinto2")
+    console.log(result[0]);
   } catch (err) {
     console.error('deu ruim ao getar um:',err);
     res.status(500).json({error:err.message});
   }
+  console.log("pinto3")
+  
 });
 
 //add
@@ -65,15 +70,24 @@ app.post('/books', async (req, res) => {
 //UPDATE
 app.patch("/books/:id", async (req, res) => {
   const id = req.params.id;
-  const { title, author_fname, author_lname } = req.body;
+  const { title, 
+          author_fname, 
+          author_lname,
+          released_year,
+          stock_quantity,
+          pages
+        } = req.body;
 
   try {
     const [result] = await db.query(
-      'UPDATE books SET title=?, author_fname=?, author_lname=? WHERE book_id=?',
+      'UPDATE books SET title=?, author_fname=?, author_lname=?,released_year=?,stock_quantity=?,pages=?  WHERE book_id=?',
       [
         title,
         author_fname,
         author_lname,
+        released_year,
+        stock_quantity,
+        pages,
         id]);
 
     console.log('Livro atualizado com ID:', id);

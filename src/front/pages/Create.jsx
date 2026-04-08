@@ -41,7 +41,7 @@ function Create() {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <button
         onClick={handleBack}
-        className="bg-gray-900 text-center w-48 rounded-2xl h-14 relative text-white text-xl font-semibold group"
+        className="cursor-pointer bg-gray-900 text-center w-48 rounded-2xl h-14 relative text-white text-xl font-semibold group"
         type="button"
       >
         <div
@@ -122,7 +122,6 @@ function Create() {
         <button
          type="submit"
          className="cursor-pointer bg-purple-600 p-2 rounded"
-
         >
           Registrar
         </button>
