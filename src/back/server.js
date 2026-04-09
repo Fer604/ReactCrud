@@ -29,16 +29,13 @@ app.get('/books', async (req, res) => {
 app.get("/books/:id", async (req, res) => {
   const id = req.params.id;
     try {
-    console.log("pinto1")
     const result = await db.query("SELECT * FROM books WHERE book_id = ?", [id]);
     res.status(200).json(result[0]);
-    console.log("pinto2")
     console.log(result[0]);
   } catch (err) {
     console.error('deu ruim ao getar um:',err);
     res.status(500).json({error:err.message});
   }
-  console.log("pinto3")
   
 });
 
