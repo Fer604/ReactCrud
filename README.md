@@ -1,20 +1,19 @@
-# 📚 Book Shop API
+# Book Shop API
 
-API REST simples para gerenciamento de livros utilizando **Node.js + Express + MySQL (MariaDB)**.
+API REST simples para gerenciamento de livros
 
 ---
 
-## 🚀 Tecnologias utilizadas
+## Tecnologias utilizadas
 
 - Node.js
 - Express
 - MySQL2 (com Promises)
-- dotenv
 - CORS
 
 ---
 
-## 📁 Estrutura do projeto
+## Estrutura do projeto
 
 ```
 
@@ -30,7 +29,7 @@ src/
 
 ---
 
-## ⚙️ Pré-requisitos
+## Pré-requisitos
 
 Antes de rodar, você precisa ter instalado:
 
@@ -39,7 +38,7 @@ Antes de rodar, você precisa ter instalado:
 
 ---
 
-## 🔑 Configuração
+## Configuração
 
 Crie um arquivo `.env` na raiz do projeto:
 
@@ -53,7 +52,7 @@ DB_PORT=3306
 
 ---
 
-## 📦 Instalação
+## Instalação
 
 No terminal, dentro do projeto:
 
@@ -63,12 +62,16 @@ npm install
 
 ---
 
-## ▶️ Como rodar o projeto
+## Como rodar o projeto
 
 ```bash
 node src/back/server.js
 ```
+e em outro terminal
 
+```bash
+npm run dev
+```
 Se tudo estiver certo, você verá:
 
 ```
@@ -79,7 +82,7 @@ Server running on port 3001
 
 ---
 
-## 🧠 Importante (sobre o banco)
+## Importante (sobre o banco)
 
 Na primeira execução:
 
@@ -88,17 +91,5 @@ Na primeira execução:
 * A tabela `books` será criada e populada
 
 ⚠️ O dump roda apenas **uma vez**, controlado pela tabela `__initialized`.
-
----
-
-## 🔥 Resetar o banco (se necessário)
-
-Se der erro de dados duplicados ou quiser resetar:
-
-```sql
-DROP DATABASE book_shop;
-```
-
-Depois rode o servidor novamente.
 
 
