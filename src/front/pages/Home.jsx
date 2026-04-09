@@ -39,8 +39,10 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 ">
       <div className="flex justify-between items-center mt-6 w-full mb-6">
-        <h1 className="text-3xl font-bold">Books</h1>
-
+        <div>
+          <h2>Aluno:Fernando Aschwanden Soviersovski</h2>
+          <h1 className="text-3xl font-bold">Books</h1>
+        </div>
         <button
           onClick={handlePage}
           className="cursor-pointer transition-all bg-purple-700 text-white px-6 py-2 rounded-lg
