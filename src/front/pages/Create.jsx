@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API } from "../auth";
 
 function Create() {
   const [book, setBook] = useState({
     title: "",
     author_fname: "",
     author_lname: "",
+    isbn: "",
+    released_year: "",
+    stock_quantity: "",
+    pages: "",
   });
 
   const navigate = useNavigate();
@@ -24,7 +29,7 @@ function Create() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:3001/books", {
+    fetch(`${API}/books`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,6 +97,14 @@ function Create() {
           name="author_lname"
           value={book.author_lname}
           placeholder="Last name"
+          onChange={handleChange}
+        />
+
+        <input 
+          className="bg-gray-700 text-white p-2 rounded"
+          name="isbn"
+          value={book.isbn}
+          placeholder="ISBN"
           onChange={handleChange}
         />
 

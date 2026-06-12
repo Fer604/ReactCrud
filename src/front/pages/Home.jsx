@@ -1,62 +1,179 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API, getToken, getUser, isAdmin, isLoggedIn, logout } from "../auth";
 
 function Home() {
   const [books, setBooks] = useState([]);
-  const [reload, setReload] = useState(0);
+  const [myLoans, setMyLoans] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const user = getUser();
+  const admin = isAdmin();
+
+  const authHeaders = { Authorization: `Bearer ${getToken()}` };
 
   useEffect(() => {
-    fetch("http://localhost:3001/books", { method: "GET" })
-      .then(res => res.json())
-      .then(data => setBooks(data))
-      .catch(err => console.error(err));
-  }, [reload]);
+    if (!isLoggedIn()) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
-  const handlePage = () => {
-    navigate("/Create");
+  const loadBooks = (q = "") => {
+    fetch(`${API}/books?q=${encodeURIComponent(q)}`)
+      .then((res) => res.json())
+      .then((data) => setBooks(data))
+      .catch((err) => console.error(err));
   };
-  const handleUpdate = (id) => {
-    navigate(`/Update/${id}`);
+
+  const loadMyLoans = () => {
+    fetch(`${API}/loans/me`, { headers: authHeaders })
+      .then((res) => res.json())
+      .then((data) => setMyLoans(Array.isArray(data) ? data : []))
+      .catch((err) => console.error(err));
   };
+
+  useEffect(() => {
+    loadBooks();
+    loadMyLoans();
+  }, []);
+
+  // Busca avançada (título, autor ou ISBN)
+  useEffect(() => {
+    const timer = setTimeout(() => loadBooks(search), 250);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3001/books/${id}`, {
-        method: "DELETE",
-      });
-      console.log("PINTO")
-
+      const response = await fetch(`${API}/books/${id}`, { method: "DELETE" });
       if (response.ok) {
-        setBooks(prevBooks =>
-          prevBooks.filter(book => Number(book.book_id) !== Number(id))
-        );
+        setBooks((prev) => prev.filter((b) => Number(b.book_id) !== Number(id)));
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleBorrow = async (book_id) => {
+    try {
+      const res = await fetch(`${API}/loans`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders },
+        body: JSON.stringify({ book_id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Erro ao emprestar");
+        return;
+      }
+      loadBooks(search);
+      loadMyLoans();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReturn = async (loanId) => {
+    try {
+      const res = await fetch(`${API}/loans/${loanId}`, {
+        method: "DELETE",
+        headers: authHeaders,
+      });
+      if (res.ok) {
+        loadBooks(search);
+        loadMyLoans();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 ">
-      <div className="flex justify-between items-center mt-6 w-full mb-6">
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      {/* Topo */}
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2>Aluno:Fernando Aschwanden Soviersovski</h2>
-          <h1 className="text-3xl font-bold">Books</h1>
+          <h2 className="text-gray-400">Olá, {user?.name}</h2>
+          <h1 className="text-3xl font-bold">Catálogo de Livros</h1>
         </div>
-        <button
-          onClick={handlePage}
-          className="cursor-pointer transition-all bg-purple-700 text-white px-6 py-2 rounded-lg
-          border-purple-800
-          border-b-[4px] hover:brightness-110 hover:-translate-y-px hover:border-b-[6px]
-          active:border-b-[2px] active:brightness-90 active:translate-y-0.5"
-        >
-          Registrar Livro
-        </button>
+        <div className="flex gap-2">
+          {admin && (
+            <>
+              <button
+                onClick={() => navigate("/admin")}
+                className="cursor-pointer bg-amber-600 hover:bg-amber-700 transition text-white px-4 py-2 rounded-lg"
+              >
+                Painel Admin
+              </button>
+              <button
+                onClick={() => navigate("/Create")}
+                className="cursor-pointer bg-purple-700 hover:bg-purple-800 transition text-white px-4 py-2 rounded-lg"
+              >
+                Registrar Livro
+              </button>
+            </>
+          )}
+          <button
+            onClick={handleLogout}
+            className="cursor-pointer bg-gray-700 hover:bg-gray-600 transition text-white px-4 py-2 rounded-lg"
+          >
+            Sair
+          </button>
+        </div>
       </div>
 
+      {/* Meus empréstimos (apenas usuário comum) */}
+      {!admin && (
+      <div className="bg-gray-800 rounded-xl p-4 mb-6">
+        <h2 className="text-lg font-semibold mb-3">Meus Empréstimos</h2>
+        {myLoans.length === 0 ? (
+          <p className="text-gray-500 text-sm">Você não tem livros emprestados.</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {myLoans.map((loan) => (
+              <li
+                key={loan.id}
+                className="flex justify-between items-center bg-gray-700/50 rounded-lg px-4 py-2"
+              >
+                <div>
+                  <span className="font-medium">{loan.book_title}</span>
+                  <span className="text-gray-400 text-sm">
+                    {" "}
+                    · devolver até {loan.due_date}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleReturn(loan.id)}
+                  className="cursor-pointer bg-emerald-600 hover:bg-emerald-700 transition text-white text-sm px-3 py-1 rounded-md"
+                >
+                  Devolver
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      )}
 
+      {/* Busca avançada */}
+      <div className="mb-6">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Busca avançada: título, autor ou ISBN..."
+          className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 outline-none text-white p-3 rounded-lg"
+        />
+        <p className="text-xs text-gray-500 mt-1">{books.length} livro(s) encontrado(s)</p>
+      </div>
 
-      <div className="grid gap-4 mb-6">
+      {/* Lista */}
+      <div className="grid gap-4">
         {books.map((book) => (
           <div
             key={book.book_id}
@@ -67,63 +184,49 @@ function Home() {
               <p className="text-gray-400">
                 {book.author_fname} {book.author_lname}
               </p>
+              <p className="text-gray-500 text-sm">
+                ISBN: {book.isbn || "—"} · {book.released_year || "?"} · Estoque:{" "}
+                {book.stock_quantity ?? 0}
+              </p>
             </div>
 
-            <div>
-              <div className="flex justify-end w-full gap-2 mt-2">
+            <div className="flex gap-2">
+              {!admin && (
                 <button
-                  className="inline-flex cursor-pointer items-center justify-center px-4 py-2 bg-cyan-500 ease-in-out delay-75 hover:bg-cyan-600
-                text-white text-sm font-medium rounded-md active:scale-95 transition-all duration-200"
-
-                  onClick={() => handleUpdate(book.book_id)}
+                  disabled={(book.stock_quantity ?? 0) <= 0}
+                  className="cursor-pointer px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition"
+                  onClick={() => handleBorrow(book.book_id)}
                 >
-                  <svg
-                    className="h-5 w-5 mr-1 self-center items-center"
-                    fill="none"
-                    stroke="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"
-                    ></path>
-                  </svg>
-                  Edit
+                  {(book.stock_quantity ?? 0) <= 0 ? "Indisponível" : "Emprestar"}
                 </button>
+              )}
 
-
-                <button
-                  className="inline-flex cursor-pointer items-center px-4 py-2 bg-rose-500 transition ease-in-out delay-75
-                  hover:bg-rose-600 text-white text-sm font-medium rounded-md "
-
-                  onClick={() => handleDelete(book.book_id)}
-                >
-                  <svg
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="h-5 w-5 mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
+              {admin && (
+                <>
+                  <button
+                    className="cursor-pointer px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-md transition"
+                    onClick={() => navigate(`/Update/${book.book_id}`)}
                   >
-                    <path
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 
-                      7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      stroke-width="2"
-                      stroke-linejoin="round"
-                      stroke-linecap="round"
-                    ></path>
-                  </svg>
-
-                  Deletar
-                </button>
-
-              </div>
+                    Editar
+                  </button>
+                  <button
+                    className="cursor-pointer px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium rounded-md transition"
+                    onClick={() => handleDelete(book.book_id)}
+                  >
+                    Deletar
+                  </button>
+                </>
+              )}
             </div>
           </div>
-
         ))}
 
+        {books.length === 0 && (
+          <p className="text-gray-500 text-center mt-8">Nenhum livro encontrado.</p>
+        )}
       </div>
     </div>
-  )
+  );
 }
+
 export default Home;

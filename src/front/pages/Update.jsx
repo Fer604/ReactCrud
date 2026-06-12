@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API } from "../auth";
 
 function Update() {
   const { book_id } = useParams();
@@ -9,13 +10,14 @@ function Update() {
   title: "",
   author_fname: "",
   author_lname: "",
+  isbn: "",
   released_year: "",
   stock_quantity: "",
   pages: ""
 });
 
   useEffect(() => {
-    fetch(`http://localhost:3001/books/${book_id}`, {method:"GET"})
+    fetch(`${API}/books/${book_id}`, {method:"GET"})
       .then(res => res.json())
       .then(data => setBook(data[0]));
   }, [book_id]);
@@ -27,7 +29,7 @@ function Update() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("1");
-    fetch(`http://localhost:3001/books/${book_id}`, {
+    fetch(`${API}/books/${book_id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -88,6 +90,7 @@ function Update() {
         <div className="space-y-2">
           <p><span className="font-semibold text-gray-400">Title:</span> {book.title}</p>
           <p><span className="font-semibold text-gray-400">Author:</span> {book.author_fname} {book.author_lname}</p>
+          <p><span className="font-semibold text-gray-400">ISBN:</span> {book.isbn}</p>
           <p><span className="font-semibold text-gray-400">Year:</span> {book.released_year}</p>
           <p><span className="font-semibold text-gray-400">Stock:</span> {book.stock_quantity}</p>
           <p><span className="font-semibold text-gray-400">Pages:</span> {book.pages}</p>
@@ -103,6 +106,7 @@ function Update() {
         <input className="bg-gray-700 p-2 rounded" placeholder="Title"name="title" value={book.title} onChange={handleChange} />
         <input className="bg-gray-700 p-2 rounded" placeholder="Author first name "name="author_fname" value={book.author_fname} onChange={handleChange} />
         <input className="bg-gray-700 p-2 rounded" placeholder="Author last name"name="author_lname" value={book.author_lname} onChange={handleChange} />
+        <input className="bg-gray-700 p-2 rounded" placeholder="ISBN"name="isbn" value={book.isbn} onChange={handleChange} />
         <input className="bg-gray-700 p-2 rounded" placeholder="Year released"name="released_year" value={book.released_year} onChange={handleChange} />
         <input className="bg-gray-700 p-2 rounded" placeholder="Stock quantity"name="stock_quantity" value={book.stock_quantity} onChange={handleChange} />
         <input className="bg-gray-700 p-2 rounded" placeholder="Number of pages"name="pages" value={book.pages} onChange={handleChange} />

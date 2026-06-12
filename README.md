@@ -1,95 +1,72 @@
-# Book Shop API
+# Biblioteca - React CRUD
 
-API REST simples para gerenciamento de livros
-
----
-
-## Tecnologias utilizadas
-
-- Node.js
-- Express
-- MySQL2 (com Promises)
-- CORS
+App simples de biblioteca: cadastro/login de usuários (JWT), catálogo de livros
+com busca avançada e painel de administração. Banco **SQLite** local (sem MySQL).
 
 ---
 
-## Estrutura do projeto
+## Tecnologias
+
+- React + Vite + Tailwind (front)
+- Node.js + Express (back)
+- SQLite via módulo nativo `node:sqlite` (sem instalar nada)
+- JWT (`jsonwebtoken`) para autenticação
+
+---
+
+## Estrutura
 
 ```
-
 src/
 ├── back/
-│    └── server.js       # API (rotas)
+│    └── server.js      # API (auth, livros, busca, admin)
 ├── db/
-│    ├── config.js       # conexão + init do banco
-│    └── init.sql        # schema + dados iniciais
-.env
+│    └── config.js      # cria o SQLite + popula dados iniciais
+└── front/
+     ├── auth.js        # helpers de login (localStorage)
+     └── pages/         # Login, Register, Home, Create, Update, Admin
+```
 
-````
-
----
-
-## Pré-requisitos
-
-Antes de rodar, você precisa ter instalado:
-
-- Node.js (>= 18 recomendado)
-- MySQL ou MariaDB rodando localmente
+> O arquivo `src/db/biblioteca.db` é criado e populado automaticamente na
+> primeira vez que o servidor sobe.
 
 ---
 
-## Configuração
+## Como rodar
 
-Crie um arquivo `.env` na raiz do projeto:
-
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=
-DB_NAME=book_shop
-DB_PORT=3306
-````
-
----
-
-## Instalação
-
-No terminal, dentro do projeto:
+Pré-requisito: Node.js >= 22 (usa o `node:sqlite` embutido).
 
 ```bash
 npm install
 ```
 
----
-
-## Como rodar o projeto
+Em um terminal, suba a API:
 
 ```bash
-node src/back/server.js
+npm run server
 ```
-e em outro terminal
+
+Em outro terminal, suba o front:
 
 ```bash
 npm run dev
 ```
-Se tudo estiver certo, você verá:
-
-```
-Database garantido
-Dump aplicado (primeira vez)
-Server running on port 3001
-```
 
 ---
 
-## Importante (sobre o banco)
+## Login de teste
 
-Na primeira execução:
+- **Admin:** `admin@biblioteca.com` / `admin123`
+- **Usuário:** `maria@email.com` / `123456`
 
-* O banco `book_shop` será criado automaticamente
-* O arquivo `init.sql` será executado
-* A tabela `books` será criada e populada
+Ou crie uma conta nova na tela de cadastro.
 
-⚠️ O dump roda apenas **uma vez**, controlado pela tabela `__initialized`.
+---
 
+## Funcionalidades
 
+- Cadastro de usuário
+- Login com validação por JWT
+- Catálogo de livros (listar, criar, editar, deletar)
+- Busca avançada por título, autor ou ISBN
+- Painel admin: estatísticas, livros emprestados, acervo e usuários cadastrados
